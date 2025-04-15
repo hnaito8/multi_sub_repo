@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>多言語リアルタイム字幕</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    .subtitle {
+      margin: 1rem 0;
+      font-size: 1.3rem;
+    }
+    .translated {
+      margin-left: 1rem;
+    }
+    select, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-right: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 多言語リアルタイム字幕</h1>
+
+  <div>
+    <label for="lang-select">翻訳言語を追加：</label>
+    <select id="lang-select">
+      <option value="en">英語</option>
+      <option value="zh-CN">中国語（簡体字）</option>
+      <option value="ko">韓国語</option>
+      <option value="fr">フランス語</option>
+      <option value="de">ドイツ語</option>
+      <option value="es">スペイン語</option>
+      <option value="ru">ロシア語</option>
+    </select>
+    <button onclick="addLanguage()">追加</button>
+  </div>
+
+  <div class="subtitle original" id="original">日本語: </div>
+  <div id="translations"></div>
+
+  <script>
+    const langNames = {
+      "en": "英語",
+      "zh-CN": "中国語",
+      "ko": "韓国語",
+      "fr": "フランス語",
+      "de": "ドイツ語",
+      "es": "スペイン語",
+      "ru": "ロシア語"
+    };
+
+    let selectedLangs = [];
+    const translationsDiv = document.getElementById('translations');
+
+    function addLanguage() {
+      const lang = document.getElementById('lang-select').value;
+      if (!selectedLangs.includes(lang)) {
+        selectedLangs.push(lang);
+
+        const div = document.createElement('div');
+        div.className = 'subtitle translated';
+        div.id = `trans-${lang}`;
+        div.textContent = `${langNames[lang]}: `;
+        translationsDiv.appendChild(div);
+      }
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ja-JP';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onresult = async function(event) {
+      const transcript = event.results[event.resultIndex][0].transcript;
+      document.getElementById('original').textContent = "日本語: " + transcript;
+
+      for (let lang of selectedLangs) {
+        try {
+          const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=${lang}&dt=t&q=${encodeURIComponent(transcript)}`);
+          const data = await res.json();
+          const translatedText = data[0].map(item => item[0]).join('');
+          document.getElementById(`trans-${lang}`).textContent = `${langNames[lang]}: ${translatedText}`;
+        } catch (err) {
+          document.getElementById(`trans-${lang}`).textContent = `${langNames[lang]}: 翻訳エラー`;
+        }
+      }
+    };
+
+    recognition.onerror = function(e) {
+      document.getElementById('original').textContent = 'エラー: ' + e.error;
+    };
+
+    recognition.start();
+  </script>
+</body>
+</html>

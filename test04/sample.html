@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>リアルタイム字幕 + 翻訳</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 2rem;
+      font-size: 1.5rem;
+    }
+    .subtitle {
+      margin: 1rem 0;
+    }
+    .original {
+      color: #0f0;
+    }
+    .translated {
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 リアルタイム字幕 + 翻訳</h1>
+  <div id="original" class="subtitle original">日本語: </div>
+  <div id="translated" class="subtitle translated">英語: </div>
+
+  <script>
+    const originalEl = document.getElementById('original');
+    const translatedEl = document.getElementById('translated');
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ja-JP';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onresult = async function(event) {
+      const transcript = event.results[event.resultIndex][0].transcript;
+      originalEl.textContent = "日本語: " + transcript;
+
+      try {
+        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=en&dt=t&q=${encodeURIComponent(transcript)}`);
+        const data = await res.json();
+        const translatedText = data[0].map(item => item[0]).join('');
+        translatedEl.textContent = "英語: " + translatedText;
+      } catch (err) {
+        translatedEl.textContent = "翻訳エラー: " + err;
+      }
+    };
+
+    recognition.onerror = function(e) {
+      originalEl.textContent = 'エラー: ' + e.error;
+    };
+
+    recognition.start();
+  </script>
+</body>
+</html>
