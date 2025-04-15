@@ -1,2 +1,3 @@
-works on google chrome\n
+works on google chrome
+
 doesn't work on safari
