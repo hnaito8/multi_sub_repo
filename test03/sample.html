@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>リアルタイム字幕</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #111;
+      color: #0f0;
+      font-size: 2rem;
+    }
+    #output {
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 リアルタイム字幕</h1>
+  <div id="output">話しかけてください...</div>
+
+  <script>
+    const output = document.getElementById('output');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = 'ja-JP'; // 日本語
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = function(event) {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        transcript += event.results[i][0].transcript;
+      }
+      output.textContent = transcript;
+    };
+
+    recognition.onerror = function(e) {
+      output.textContent = 'エラー: ' + e.error;
+    };
+
+    recognition.start();
+  </script>
+</body>
+</html>
