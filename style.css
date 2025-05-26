@@ -1,0 +1,46 @@
+body {
+  font-family: sans-serif;
+  background: #111;
+  color: #fff;
+  padding: 2rem;
+}
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+.subtitle {
+  margin: 1rem 0;
+  font-size: 1.3rem;
+}
+.translated {
+  margin-left: 1rem;
+}
+select,
+button {
+  padding: 0.6rem;
+  font-size: 1rem;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  border-radius: 6px;
+  background: #222;
+  color: #fff;
+  border: 1px solid #fff;
+}
+.lang-label {
+  font-size: 1rem;
+  color: #fff;
+}
+.remove-btn {
+  margin-left: 1rem;
+  background: #f33;
+  border: none;
+  color: white;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#lang-select,
+#input-lang {
+  max-height: 150px;
+  overflow-y: auto;
+}
